@@ -2,6 +2,8 @@ package model;
 
 import java.awt.Point;
 
+import control.Heuristic;
+import control.Heuristic_2;
 import view.Board;
 
 import javax.swing.*;
@@ -46,7 +48,7 @@ public class AI extends Entity implements Runnable {
 
             move(board.getValueBoard());
 
-            int value = board.getState(board.getValueBoard(), 2);
+            int value = new Heuristic_2().isWin(2);
             if (value >= board.getScoreWin()) {
                 JOptionPane.showConfirmDialog(board , "AI WIN");
                 return;

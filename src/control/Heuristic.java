@@ -23,7 +23,7 @@ public class Heuristic {
         if (list.size() == 0) {
             return 0;
         }
-        Collections.sort(list);
+
 //        System.out.println(list.toString());
 
 //        for (int i = 0; i < valueBoard.length; i++) {
@@ -97,6 +97,7 @@ public class Heuristic {
             Arrays.fill(haveStepDownLeft[i], false);
         }
 
+//        Point local = board.getWentGo().get(board.getWentGo().size() - 1)
 
         for (Point local : board.getWentGo()) {
             int i = local.x;
@@ -125,9 +126,9 @@ public class Heuristic {
                     int numberDownLeft = getNumberDownLeft(valueBoard, i, j, idPlayer, haveStepDownLeft);
                     information.setNumberDownLeft(numberDownLeft);
                 }
-                if (information.getSum() > 0) {
-                    list.add(information);
-                }
+
+                list.add(information);
+
             }
         }
 
@@ -178,7 +179,7 @@ public class Heuristic {
                 i1++;
                 i2--;
             }
-        }else{
+        } else {
             haveStepDownLeft[n][m] = false;
         }
         return (canMove ? numberDonwLeft : 0);

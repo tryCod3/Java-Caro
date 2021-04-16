@@ -41,7 +41,8 @@ public class Mouse implements MouseListener {
                     board.changeIcon("X.png", area);
                     board.changeValue(x, y, 1);
                 }
-                int value = board.getState(board.getValueBoard(), 1);
+                int value = new Heuristic_2().isWin(1);
+                System.out.println("value = " + value);
                 if (value >= board.getScoreWin()) {
                     System.out.println("OK YOU WIN");
                     JOptionPane.showConfirmDialog(board , "YOU WIN");

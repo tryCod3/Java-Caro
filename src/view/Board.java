@@ -1,6 +1,7 @@
 package view;
 
 import control.Heuristic;
+import control.Heuristic_2;
 import model.AI;
 
 import java.awt.*;
@@ -57,23 +58,25 @@ public class Board extends JPanel implements Display {
     private static final int way3 = (int) 1e3;
     private static final int way2 = (int) 1e1;
 
+    public static int getWay4() {
+        return way4;
+    }
+
+    public static int getWay3() {
+        return way3;
+    }
+
+    public static int getWay2() {
+        return way2;
+    }
 
     public int getScoreWin() {
         return scoreWin;
     }
 
-    public int getWay4() {
-        return way4;
-    }
-
-    public int getWay3() {
-        return way3;
-    }
-
-    public int getWay2() {
-        return way2;
-    }
-
+    // 1 , 2 , 3 , 4
+    public static final int evalutionG[] = {1, 10, 1000, 50000};
+    public static final int evalutionB[] = {0, 5, 5000, 25000};
 
     private static final Board instance = new Board();
 
@@ -181,7 +184,7 @@ public class Board extends JPanel implements Display {
      * </P>
      */
     public int getState(int[][] valueBoard, int idPlayer) {
-        return new Heuristic().think(valueBoard, idPlayer);
+        return new Heuristic_2().think(valueBoard, idPlayer);
     }
 
     /**
@@ -267,37 +270,6 @@ public class Board extends JPanel implements Display {
             Arrays.fill(checked[i], false);
         }
 
-        int rx1 = -1, rx2 = -1;
-        int ry1 = -1, ry2 = -1;
-
-        ArrayList<Integer> listX = new ArrayList<>();
-        ArrayList<Integer> listY = new ArrayList<>();
-
-        for (Point location :
-                wentGo) {
-            listX.add(location.x);
-            listY.add(location.y);
-        }
-
-        if (listX.size() >= 1) {
-
-            Collections.sort(listX);
-            Collections.sort(listY);
-
-            int min_x = listX.get(0);
-            int max_x = listX.get(listX.size() - 1);
-
-            int min_y = listY.get(0);
-            int max_y = listY.get(listY.size() - 1);
-
-
-            rx1 = Math.max(0, min_x - 1);
-            rx2 = Math.min(Board.getROW() - 1, max_x + 1);
-            ry1 = Math.max(0, min_y - 1);
-            ry2 = Math.min(Board.getCOL() - 1, max_y + 1);
-        }
-
-
         for (Point location : wentGo) {
             // search 8 ô xung quanh 1 điểm
             for (int i = -1; i <= 1; i++) {
@@ -312,14 +284,15 @@ public class Board extends JPanel implements Display {
 //                            checked[stepI][stepJ] = true;
 //                        }
 //                    } else {
-                        if (isInBoard(stepI, stepJ) && valueBoard[stepI][stepJ] == 0 && !checked[stepI][stepJ]) {
-                            arrays.add(new Point(stepI, stepJ));
-                            checked[stepI][stepJ] = true;
-                        }
+                    if (isInBoard(stepI, stepJ) && valueBoard[stepI][stepJ] == 0 && !checked[stepI][stepJ]) {
+                        arrays.add(new Point(stepI, stepJ));
+                        checked[stepI][stepJ] = true;
+                    }
 //                    }
                 }
             }
         }
+
         return arrays;
     }
 
