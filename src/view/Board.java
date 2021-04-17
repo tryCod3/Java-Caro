@@ -17,8 +17,8 @@ public class Board extends JPanel implements Display {
     /**
      * tạo ROW hàng và COL cột
      */
-    private static final int ROW = 20;
-    private static final int COL = 20;
+    private static final int ROW = 12;
+    private static final int COL = 12;
     private static boolean firstMove = true;
 
     public static boolean isFirstMove() {

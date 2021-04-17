@@ -2,8 +2,31 @@ package control;
 
 import view.Board;
 
+
 import java.awt.*;
 import java.util.ArrayList;
+
+class Infor {
+
+    int node = 0;
+    int br = 0;
+    int stop = 0;
+
+    public Infor(int node, int br, int stop) {
+        this.node = node;
+        this.br = br;
+        this.stop = stop;
+    }
+
+    @Override
+    public String toString() {
+        return "Infor{" +
+                "node=" + node +
+                ", br=" + br +
+                ", stop=" + stop +
+                '}';
+    }
+}
 
 public class Heuristic_2 {
 
@@ -11,16 +34,7 @@ public class Heuristic_2 {
 
     private static final int arrAttack[][] = {
             {0, 0}, // 0
-            {1, 1}, // 1
-            {100, 30}, // 2
-            {1000, 300}, // 3
-            {100000, 30000}, // 4
-            {10000000, 10000000} // 5
-    };
-
-    private static final int arrDefen[][] = {
-            {0, 0}, // 0
-            {1, 1}, // 1
+            {1, 1, 1}, // 1
             {100, 30}, // 2
             {1000, 300}, // 3
             {100000, 30000}, // 4
@@ -31,7 +45,6 @@ public class Heuristic_2 {
         for (Point i :
                 board.getWentGo()) {
             if (board.getValueBoard()[i.x][i.y] == idPlayer) {
-                // atack > boad.getWin
                 int sum = atttack(i, board.getValueBoard(), idPlayer);
                 if (sum >= board.getScoreWin()) {
                     return sum;
@@ -53,179 +66,69 @@ public class Heuristic_2 {
             }
 
         }
-        if(sum <= 300) {
-            sum = Math.max(sum, defen(newPoint, valueBoard, idPlayer));
-        }
+
         return sum;
     }
 
-
-    private int defen(Point point, int[][] valueBoard, int idPlayer) {
-        int sum = 0;
-        ArrayList<Point> list = defen_all(point, valueBoard, idPlayer);
-        for (Point i :
-                list) {
-            int x = i.x;
-            int y = i.y;
-            if(x >= 4){
-                sum += arrDefen[x][y];
-            }
+    void show(ArrayList<Infor> list , String name){
+        System.out.println("name = " + name);
+        for (Infor i:
+             list) {
+            System.out.println(i.toString());
         }
-        return sum;
     }
-
-    private ArrayList<Point> defen_all(Point point, int[][] valueBoard, int idPlayer) {
-        ArrayList<Point> list = new ArrayList<>();
-        int x = point.x;
-        int y = point.y;
-
-        int left = Math.max(0, y - 4);
-        int mx = 0;
-        for (int i = y - 1; i >= left; i--) {
-            if (valueBoard[x][i] > 0 && valueBoard[x][i] != idPlayer) {
-                mx++;
-            } else if (valueBoard[x][i] == idPlayer) {
-                break;
-            }
-        }
-
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-        int right = Math.min(Board.getCOL() - 1, y + 4);
-        mx = 0;
-        for (int i = y + 1; i <= right; i++) {
-            if (valueBoard[x][i] > 0 && valueBoard[x][i] != idPlayer) {
-                mx++;
-            } else if (valueBoard[x][i] == idPlayer) {
-                break;
-            }
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-        int up = Math.max(0, x - 4);
-        mx = 0;
-        for (int i = x - 1; i >= up; i--) {
-            if (valueBoard[i][y] > 0 && valueBoard[x][i] != idPlayer) {
-                mx++;
-            } else if (valueBoard[x][i] == idPlayer) {
-                break;
-            }
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-        int down = Math.min(Board.getROW() - 1, x + 4);
-        mx = 0;
-        for (int i = x + 1; i <= down; i++) {
-            if (valueBoard[i][y] > 0 && valueBoard[x][i] != idPlayer) {
-                mx++;
-            } else if (valueBoard[x][i] == idPlayer) {
-                break;
-            }
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-        // downLeft
-        mx = 0;
-        int i1 = x + 1;
-        int i2 = y - 1;
-        int time = 4;
-        while (time > 0 && board.isInBoard(i1, i2)) {
-            if (valueBoard[i1][i2] > 0 && valueBoard[i1][i2] != idPlayer) {
-                mx++;
-            } else if (valueBoard[i1][i2] == idPlayer) {
-                break;
-            }
-            i1++;
-            i2--;
-            time--;
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-
-        // downRight
-        mx = 0;
-        i1 = x + 1;
-        i2 = y + 1;
-        time = 4;
-        while (time > 0 && board.isInBoard(i1, i2)) {
-            if (valueBoard[i1][i2] > 0 && valueBoard[i1][i2] != idPlayer) {
-                mx++;
-            } else if (valueBoard[i1][i2] == idPlayer) {
-                break;
-            }
-            i1++;
-            i2++;
-            time--;
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-        // upLeft
-        mx = 0;
-        i1 = x - 1;
-        i2 = y - 1;
-        time = 4;
-        while (time > 0 && board.isInBoard(i1, i2)) {
-            if (valueBoard[i1][i2] > 0 && valueBoard[i1][i2] != idPlayer) {
-                mx++;
-            } else if (valueBoard[i1][i2] == idPlayer) {
-                break;
-            }
-            i1--;
-            i2--;
-            time--;
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-
-        // upRight
-        mx = 0;
-        i1 = x - 1;
-        i2 = y + 1;
-        time = 4;
-        while (time > 0 && board.isInBoard(i1, i2)) {
-            if (valueBoard[i1][i2] > 0 && valueBoard[i1][i2] != idPlayer) {
-                mx++;
-            } else if (valueBoard[i1][i2] == idPlayer) {
-                break;
-            }
-            i1--;
-            i2++;
-            time--;
-        }
-        list.add(new Point(mx, (mx >= 4 ? 0 : 1)));
-
-
-        return list;
-    }
-
 
     public int atttack(Point point, int[][] valueBoard, int idPlayer) {
 
-        ArrayList<Point> listHorizal = getHorizal(point, valueBoard, idPlayer);
-        ArrayList<Point> listVertival = getVertical(point, valueBoard, idPlayer);
-        ArrayList<Point> listDiagonalMain = getDiagonalMain(point, valueBoard, idPlayer);
-        ArrayList<Point> listDiagonalSecond = getDiagonalSecond(point, valueBoard, idPlayer);
+        ArrayList<Infor> listHorizal = getHorizal(point, valueBoard, idPlayer);
+        ArrayList<Infor> listVertival = getVertical(point, valueBoard, idPlayer);
+        ArrayList<Infor> listDiagonalMain = getDiagonalMain(point, valueBoard, idPlayer);
+        ArrayList<Infor> listDiagonalSecond = getDiagonalSecond(point, valueBoard, idPlayer);
 
-        ArrayList<Point> allList = new ArrayList<>();
+
+//        show(listHorizal , "ngang");
+//        show(listVertival , "doc");
+//        show(listDiagonalMain , "dcc");
+//        show(listDiagonalSecond , "dcp");
+
+        ArrayList<Infor> allList = new ArrayList<>();
         allList.addAll(listHorizal);
         allList.addAll(listVertival);
         allList.addAll(listDiagonalMain);
         allList.addAll(listDiagonalSecond);
 
         int sum = 0;
-        for (Point i :
+        for (Infor i :
                 allList) {
-            int xx = i.x;
-            int yy = i.y;
-            sum += arrAttack[xx][yy];
+            int x = i.node;
+            int y = i.br;
+            int z = i.stop;
+            if (x == 1 && y == 0 && z == 0) sum += 1;
+
+            if (x == 2 && y == 0 && z == 0) sum += 80;
+            if (x == 2 && y == 0 && z == 1) sum += 50;
+            if (x == 2 && y == 1 && z == 0) sum += 50;
+            if (x == 2 && y == 1 && z == 1) sum += 30;
+
+            if (x == 3 && y == 0 && z == 0) sum += 1000;
+            if (x == 3 && y == 0 && z == 1) sum += 500;
+            if (x == 3 && y == 1 && z == 0) sum += 500;
+            if (x == 3 && y == 1 && z == 1) sum += 100;
+
+            if (x == 4 && y == 0 && z == 0) sum += 100000;
+            if (x == 4 && y == 0 && z == 1) sum += 60000;
+            if (x == 4 && y == 1 && z == 0) sum += 60000;
+            if (x == 4 && y == 1 && z == 1) sum += 40000;
+
+            if (x == 5 && y == 0 && z == 0) sum += 10000000;
         }
 //        System.out.println("sum = " + sum);
         return sum;
     }
 
 
-    private ArrayList<Point> getHorizal(Point point, int[][] valueBoard, int idPlayer) {
-        ArrayList<Point> list = new ArrayList<>();
+    private ArrayList<Infor> getHorizal(Point point, int[][] valueBoard, int idPlayer) {
+        ArrayList<Infor> list = new ArrayList<>();
         int x = point.x;
         int y = point.y;
         int bg = Math.max(0, y - 4);
@@ -237,68 +140,61 @@ public class Heuristic_2 {
             }
         }
 
-        int en = Math.min(Board.getCOL() - 1, y + 4);
-        for (int i = y; i <= en; i++) {
-            if (valueBoard[x][i] > 0 && valueBoard[x][i] != idPlayer) {
-                en = i - 1;
+        for (int i = bg; i <= y; i++) {
+            int mx = 0;
+            int checkIndexZero4 = -1;
+            int checkIndexZero3_1 = -1;
+            int checkIndexZero3_2 = -1;
+            int checkIndex2_1 = -1;
+            int checkIndex2_2 = -1;
+            int en2 = Math.min(i + 4, Board.getCOL() - 1);
+//                System.out.println(i + " " +  en2);
+            for (int k = i; k <= Math.min(i + 4, Board.getCOL() - 1); k++) {
+                if (valueBoard[x][k] > 0 && valueBoard[x][k] != idPlayer) {
+                    en2 = k - 1;
+                    break;
+                }
+            }
+
+            for (int j = i; j <= en2; j++) {
+                if (valueBoard[x][j] == idPlayer) {
+                    mx++;
+                    if (checkIndex2_1 == -1) {
+                        checkIndex2_1 = j;
+                        continue;
+                    }
+                    if (checkIndex2_2 == -1) {
+                        checkIndex2_2 = j;
+                    }
+                } else {
+                    checkIndexZero4 = j;
+                    if (checkIndexZero3_1 == -1) {
+                        checkIndexZero3_1 = j;
+                        continue;
+                    }
+                    checkIndexZero3_2 = j;
+                }
+            }
+            if (mx == 5) {
+                list.add(new Infor(5, 0, 0));
                 break;
+            } else if (mx == 4) {
+                list.add(checkFourH(checkIndexZero4, i, en2, x, y));
+            } else if (mx == 3) {
+                list.add(checkThreeH(checkIndexZero3_1, checkIndexZero3_2, i, en2, x, y));
+            } else if (mx == 2) {
+                list.add(checkTwoH(checkIndex2_1, checkIndex2_2, i, en2, x, y));
+            } else if (mx == 1) {
+                list.add(new Infor(1, 0, 0));
             }
         }
 
-        if (en - bg + 1 >= 5) {
-            for (int i = bg; i <= y; i++) {
-                int mx = 0;
-                int checkIndexZero4 = -1;
-                int checkIndexZero3_1 = -1;
-                int checkIndexZero3_2 = -1;
-                int checkIndex2_1 = -1;
-                int checkIndex2_2 = -1;
-                int en2 = Math.min(Board.getCOL() - 1, i + 4);
-//                System.out.println(i + " " +  en2);
-                if (en2 > en) break;
-                for (int j = i; j <= en2; j++) {
-                    if (valueBoard[x][j] == idPlayer) {
-                        mx++;
-                        if (checkIndex2_1 == -1) {
-                            checkIndex2_1 = j;
-                            continue;
-                        }
-                        if (checkIndex2_2 == -1) {
-                            checkIndex2_2 = j;
-                            continue;
-                        }
-                    } else {
-                        checkIndexZero4 = j;
-                        if (checkIndexZero3_1 == -1) {
-                            checkIndexZero3_1 = j;
-                            continue;
-                        }
-                        if (checkIndexZero3_1 != -1) {
-                            checkIndexZero3_2 = j;
-                            continue;
-                        }
-                    }
-                }
-                if (mx == 5) {
-                    list.add(new Point(mx, 0));
-//                    break;
-                } else if (mx == 4) {
-                    list.add(new Point(mx, checkFour(checkIndexZero4, i, en2)));
-                } else if (mx == 3) {
-                    list.add(new Point(mx, checkThree(checkIndexZero3_1, checkIndexZero3_2, i, en2)));
-                } else if (mx == 2) {
-                    list.add(new Point(mx, checkTwo(checkIndex2_1, checkIndex2_2)));
-                } else if (mx == 1) {
-                    list.add(new Point(mx, 0));
-                }
-            }
-        }
 
         return list;
     }
 
-    private ArrayList<Point> getVertical(Point point, int[][] valueBoard, int idPlayer) {
-        ArrayList<Point> list = new ArrayList<>();
+    private ArrayList<Infor> getVertical(Point point, int[][] valueBoard, int idPlayer) {
+        ArrayList<Infor> list = new ArrayList<>();
         int x = point.x;
         int y = point.y;
 
@@ -310,251 +206,139 @@ public class Heuristic_2 {
             }
         }
 
-        int en = Math.min(Board.getROW() - 1, x + 4);
-        for (int i = x; i <= en; i++) {
-            if (valueBoard[i][y] > 0 && valueBoard[i][y] != idPlayer) {
-                en = i - 1;
-                break;
-            }
-        }
-
-        if (en - bg + 1 >= 5) {
-            for (int i = bg; i <= x; i++) {
-                int mx = 0;
-                int checkIndexZero4 = -1;
-                int checkIndexZero3_1 = -1;
-                int checkIndexZero3_2 = -1;
-                int checkIndex2_1 = -1;
-                int checkIndex2_2 = -1;
-                int en2 = Math.min(Board.getROW() - 1, i + 4);
+        for (int i = bg; i <= x; i++) {
+            int mx = 0;
+            int checkIndexZero4 = -1;
+            int checkIndexZero3_1 = -1;
+            int checkIndexZero3_2 = -1;
+            int checkIndex2_1 = -1;
+            int checkIndex2_2 = -1;
+            int en2 = Math.min(Board.getROW() - 1, i + 4);
 //                System.out.println(i + " " + en2);
-                if (en2 > en) break;
-                for (int j = i; j <= en2; j++) {
-//                    System.out.println(j + " " + y);
-                    if (valueBoard[j][y] == idPlayer) {
-                        mx++;
-                        if (checkIndex2_1 == -1) {
-                            checkIndex2_1 = j;
-                            continue;
-                        }
-                        if (checkIndex2_1 != -1 && checkIndex2_2 == -1) {
-                            checkIndex2_2 = j;
-                            continue;
-                        }
-                    } else {
-                        checkIndexZero4 = j;
-                        if (checkIndexZero3_1 == -1) {
-                            checkIndexZero3_1 = j;
-                            continue;
-                        }
-                        if (checkIndexZero3_1 != -1) {
-                            checkIndexZero3_2 = j;
-                            continue;
-                        }
-                    }
-                }
-                if (mx == 5) {
-                    list.add(new Point(mx, 0));
-//                    break;
-                } else if (mx == 4) {
-                    list.add(new Point(mx, checkFour(checkIndexZero4, i, en2)));
-                } else if (mx == 3) {
-                    list.add(new Point(mx, checkThree(checkIndexZero3_1, checkIndexZero3_2, i, en2)));
-                } else if (mx == 2) {
-                    list.add(new Point(mx, checkTwo(checkIndex2_1, checkIndex2_2)));
-                } else if (mx == 1) {
-                    list.add(new Point(mx, 0));
-                }
-            }
-        }
 
-        return list;
-    }
-
-    private ArrayList<Point> getDiagonalMain(Point point, int[][] valueBoard, int idPlayer) {
-        ArrayList<Point> list = new ArrayList<>();
-
-        int x = point.x;
-        int y = point.y;
-
-        int _min = Math.min(x, y);
-
-        int beg_x = Math.max(0, x - 4);
-        int beg_y = Math.max(0, y - 4);
-
-        for (int i = x, j = y; i >= beg_x && j >= beg_y; i--, j--) {
-            if (valueBoard[i][j] > 0 && valueBoard[i][j] != idPlayer) {
-                beg_x = i + 1;
-                beg_y = j + 1;
-                break;
-            }
-        }
-
-        int end_x = Math.min(Board.getROW() - 1, x + 4);
-        int end_y = Math.min(Board.getCOL() - 1, y + 4);
-
-        for (int i = x, j = y; i <= end_x && j <= end_y; i++, j++) {
-            if (valueBoard[i][j] > 0 && valueBoard[i][j] != idPlayer) {
-                end_x = i - 1;
-                end_y = j - 1;
-                break;
-            }
-        }
-
-        if (end_x - beg_x + 1 >= 5) {
-
-            for (int i = beg_x, j = beg_y; i <= x && j <= y; i++, j++) {
-
-
-                int end_x1 = Math.min(Board.getROW() - 1, i + 4);
-                int end_y1 = Math.min(Board.getCOL() - 1, j + 4);
-
-                int mx = 0;
-                int checkIndexZero4 = -1;
-                int checkIndexZero3_1 = -1;
-                int checkIndexZero3_2 = -1;
-                int checkIndex2_1 = -1;
-                int checkIndex2_2 = -1;
-
-//                System.out.println(i + " " + j + " " + end_x1 + " " + end_y1);
-                if (end_x1 > end_x) break;
-
-                for (int i1 = i, j1 = j; i1 <= end_x1 && j1 <= end_y1; i1++, j1++) {
-                    try {
-                        if (valueBoard[i1][j1] == idPlayer) {
-                            mx++;
-                            if (checkIndex2_1 == -1) {
-                                checkIndex2_1 = j1;
-                                continue;
-                            }
-                            if (checkIndex2_1 != -1) {
-                                checkIndex2_2 = j1;
-                                continue;
-                            }
-                        } else {
-                            checkIndexZero4 = j1;
-                            if (checkIndexZero3_1 == -1) {
-                                checkIndexZero3_1 = j1;
-                                continue;
-                            }
-                            if (checkIndexZero3_1 != -1) {
-                                checkIndexZero3_2 = j1;
-                                continue;
-                            }
-                        }
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        System.out.println("try : " + i1 + " " + j1);
-                        e.printStackTrace();
-                    }
-                }
-                if (mx == 5) {
-                    list.add(new Point(mx, 0));
+            for (int k = i; k <= Math.min(Board.getROW() - 1, i + 4); k++) {
+                if (valueBoard[k][y] > 0 && valueBoard[k][y] != idPlayer) {
+                    en2 = k - 1;
                     break;
-                } else if (mx == 4) {
-                    list.add(new Point(mx, checkFour(checkIndexZero4, j, end_y1)));
-                } else if (mx == 3) {
-                    list.add(new Point(mx, checkThree(checkIndexZero3_1, checkIndexZero3_2, j, end_y1)));
-                } else if (mx == 2) {
-                    list.add(new Point(mx, checkTwo(checkIndex2_1, checkIndex2_2)));
-                } else {
-                    list.add(new Point(mx, 0));
                 }
-
             }
 
+            for (int j = i; j <= en2; j++) {
+//                    System.out.println(j + " " + y);
+                if (valueBoard[j][y] == idPlayer) {
+                    mx++;
+                    if (checkIndex2_1 == -1) {
+                        checkIndex2_1 = j;
+                        continue;
+                    }
+                    checkIndex2_2 = j;
+                } else {
+                    checkIndexZero4 = j;
+                    if (checkIndexZero3_1 == -1) {
+                        checkIndexZero3_1 = j;
+                        continue;
+                    }
+                    checkIndexZero3_2 = j;
+                }
+            }
+            if (mx == 5) {
+                list.add(new Infor(5, 0, 0));
+                break;
+            } else if (mx == 4) {
+                list.add(checkFourV(checkIndexZero4, i, en2, x, y));
+            } else if (mx == 3) {
+                list.add(checkThreeV(checkIndexZero3_1, checkIndexZero3_2, i, en2, x, y));
+            } else if (mx == 2) {
+                list.add(checkTwoV(checkIndex2_1, checkIndex2_2, i, en2, x, y));
+            } else if (mx == 1) {
+                list.add(new Infor(1, 0, 0));
+            }
         }
+
 
         return list;
     }
 
-
-    private ArrayList<Point> getDiagonalSecond(Point point, int[][] valueBoard, int idPlayer) {
-        ArrayList<Point> list = new ArrayList<>();
+    private ArrayList<Infor> getDiagonalMain(Point point, int[][] valueBoard, int idPlayer) {
+        ArrayList<Infor> list = new ArrayList<>();
 
         int x = point.x;
         int y = point.y;
 
-        int beg_x = Math.max(0, x - 4);
-        int beg_y = Math.min(Board.getCOL() - 1, y + 4);
+        int beg_x = x;
+        int beg_y = y;
+        int time = 5;
 
-        for (int i = x, j = y; i >= beg_x && j <= beg_y; i--, j++) {
-            if (valueBoard[i][j] > 0 && valueBoard[i][j] != idPlayer) {
-                beg_x = i + 1;
-                beg_y = j - 1;
+        while (time > 0 && beg_x >= 0 && beg_y >= 0) {
+            if (valueBoard[beg_x][beg_y] > 0 && valueBoard[beg_x][beg_y] != idPlayer) {
+                beg_x++;
+                beg_y++;
                 break;
             }
+            if (beg_x - 1 < 0 || beg_y - 1 < 0) break;
+            beg_x--;
+            beg_y--;
+            time--;
         }
 
-        int end_x = Math.min(Board.getROW() - 1, x + 4);
-        int end_y = Math.max(0, y - 4);
+        for (int i = beg_x, j = beg_y; i <= x && j <= y; i++, j++) {
 
-        for (int i = x, j = y; i <= end_x && j >= end_y; i++, j--) {
-            if (valueBoard[i][j] > 0 && valueBoard[i][j] != idPlayer) {
-                end_x = i - 1;
-                end_y = j + 1;
-                break;
+            int end_x1 = i;
+            int end_y1 = j;
+            time = 4;
+
+            while (time > 0 && end_x1 < Board.getROW() && end_y1 < Board.getCOL()) {
+                if (valueBoard[end_x1][end_y1] > 0 && valueBoard[end_x1][end_y1] != idPlayer) {
+                    end_x1--;
+                    end_y1--;
+                    break;
+                }
+                if (end_x1 + 1 >= Board.getROW() || end_y1 + 1 >= Board.getCOL()) break;
+                end_x1++;
+                end_y1++;
+                time--;
             }
-        }
 
-        if (end_x - beg_x + 1 >= 5) {
+            int mx = 0;
+            int checkIndexZero4 = -1;
+            int checkIndexZero3_1 = -1;
+            int checkIndexZero3_2 = -1;
+            int checkIndex2_1 = -1;
+            int checkIndex2_2 = -1;
 
-            for (int i = beg_x, j = beg_y; i <= x && j >= y; i++, j--) {
-
-                int end_x1 = Math.min(Board.getROW() - 1, i + 4);
-                int end_y1 = Math.max(0, j - 4);
-
-                int mx = 0;
-                int checkIndexZero4 = -1;
-                int checkIndexZero3_1 = -1;
-                int checkIndexZero3_2 = -1;
-                int checkIndex2_1 = -1;
-                int checkIndex2_2 = -1;
-
-//                System.out.println(i + " " + j + " " + end_x1 + " " + end_y1);
-                if (end_x1 > end_x) break;
-
-                for (int i1 = i, j1 = j; i1 <= end_x1 && j1 >= end_y1; i1++, j1--) {
-                    try {
-
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        System.out.println("try : " + i1 + " " + j1);
-                        e.printStackTrace();
-                    }
+            for (int i1 = i, j1 = j; i1 <= end_x1 && j1 <= end_y1; i1++, j1++) {
+                try {
                     if (valueBoard[i1][j1] == idPlayer) {
                         mx++;
                         if (checkIndex2_1 == -1) {
                             checkIndex2_1 = j1;
                             continue;
                         }
-                        if (checkIndex2_1 != -1) {
-                            checkIndex2_2 = j1;
-                            continue;
-                        }
+                        checkIndex2_2 = j1;
                     } else {
                         checkIndexZero4 = j1;
                         if (checkIndexZero3_1 == -1) {
                             checkIndexZero3_1 = j1;
                             continue;
                         }
-                        if (checkIndexZero3_1 != -1) {
-                            checkIndexZero3_2 = j1;
-                            continue;
-                        }
+                        checkIndexZero3_2 = j1;
                     }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.out.println("try : " + i1 + " " + j1);
+                    e.printStackTrace();
                 }
-                if (mx == 5) {
-                    list.add(new Point(mx, 0));
-                    break;
-                } else if (mx == 4) {
-                    list.add(new Point(mx, checkFour(checkIndexZero4, j, end_y1)));
-                } else if (mx == 3) {
-                    list.add(new Point(mx, checkThree(checkIndexZero3_1, checkIndexZero3_2, end_y1, j)));
-                } else if (mx == 2) {
-                    list.add(new Point(mx, checkTwo(checkIndex2_1, checkIndex2_2)));
-                } else {
-                    list.add(new Point(mx, 0));
-                }
-
+            }
+            if (mx == 5) {
+                list.add(new Infor(5, 0, 0));
+                break;
+            } else if (mx == 4) {
+                list.add(checkFourDm(checkIndexZero4, i, j, end_x1, end_y1));
+            } else if (mx == 3) {
+                list.add(checkThreeDm(checkIndexZero3_1, checkIndexZero3_2, i, j, end_x1, end_y1));
+            } else if (mx == 2) {
+                list.add(checkTwoDm(checkIndex2_1, checkIndex2_2, i, j, end_x1, end_y1));
+            } else {
+                list.add(new Infor(1, 0, 0));
             }
 
         }
@@ -562,45 +346,516 @@ public class Heuristic_2 {
         return list;
     }
 
+    private ArrayList<Infor> getDiagonalSecond(Point point, int[][] valueBoard, int idPlayer) {
+        ArrayList<Infor> list = new ArrayList<>();
 
-    private int checkFour(int checkIndexZero4, int bg, int en) {
-        return (checkIndexZero4 == bg || checkIndexZero4 == en ? 0 : 1);
-    }
+        int x = point.x;
+        int y = point.y;
 
-    private int checkThree(int checkIndexZero3_1, int checkIndexZero3_2, int bg, int en) {
-        if (checkIndexZero3_1 == bg && checkIndexZero3_2 == en) {
-            return 0;
+        int beg_x = x;
+        int beg_y = y;
+        int time = 5;
+
+        while (time > 0 && beg_x >= 0 && beg_y < Board.getCOL()) {
+            if (valueBoard[beg_x][beg_y] > 0 && valueBoard[beg_x][beg_y] != idPlayer) {
+                beg_x++;
+                beg_y--;
+                break;
+            }
+            if (beg_x - 1 < 0 || beg_y + 1 >= Board.getCOL()) {
+                break;
+            }
+            beg_x--;
+            beg_y++;
+            time--;
         }
-        if (checkIndexZero3_1 + 1 == checkIndexZero3_2 && (checkIndexZero3_1 == bg || checkIndexZero3_2 == en)) {
-            if (checkIndexZero3_1 == bg) return 0;
-            if (checkIndexZero3_2 == en) return 0;
+
+        for (int i = beg_x, j = beg_y; i <= x && j >= y; i++, j--) {
+
+            int end_x1 = i;
+            int end_y1 = j;
+            time = 4;
+
+            while (time > 0 && end_x1 < Board.getROW() && end_y1 >= 0) {
+                if (valueBoard[end_x1][end_y1] > 0 && valueBoard[end_x1][end_y1] != idPlayer) {
+                    end_x1--;
+                    end_y1++;
+                    break;
+                }
+                if (end_x1 + 1 >= Board.getROW() || end_y1 - 1 < 0) {
+                    break;
+                }
+                end_x1++;
+                end_y1--;
+                time--;
+            }
+
+            int mx = 0;
+            int checkIndexZero4 = -1;
+            int checkIndexZero3_1 = -1;
+            int checkIndexZero3_2 = -1;
+            int checkIndex2_1 = -1;
+            int checkIndex2_2 = -1;
+
+//                System.out.println(i + " " + j + " " + end_x1 + " " + end_y1);
+
+            for (int i1 = i, j1 = j; i1 <= end_x1 && j1 >= end_y1; i1++, j1--) {
+                try {
+
+                    if (valueBoard[i1][j1] == idPlayer) {
+                        mx++;
+                        if (checkIndex2_1 == -1) {
+                            checkIndex2_1 = j1;
+                            continue;
+                        }
+                        checkIndex2_2 = j1;
+                    } else {
+                        checkIndexZero4 = j1;
+                        if (checkIndexZero3_1 == -1) {
+                            checkIndexZero3_1 = j1;
+                            continue;
+                        }
+                        checkIndexZero3_2 = j1;
+                    }
+
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.out.println("try : " + i1 + " " + j1);
+                    e.printStackTrace();
+                }
+            }
+            if (mx == 5) {
+                list.add(new Infor(5, 0, 0));
+                break;
+            } else if (mx == 4) {
+                list.add(checkFourDs(checkIndexZero4, i, j, end_x1, end_y1));
+            } else if (mx == 3) {
+                list.add(checkThreeDs(checkIndexZero3_1, checkIndexZero3_2, i, j, end_x1, end_y1));
+            } else if (mx == 2) {
+                list.add(checkTwoDs(checkIndex2_1, checkIndex2_2, i, j, end_x1, end_y1));
+            } else {
+                list.add(new Infor(1, 0, 0));
+            }
+
         }
-        return 1;
+
+
+        return list;
     }
 
-    private int checkTwo(int checkIndex2_1, int checkIndex2_2) {
-        return (checkIndex2_1 + 1 == checkIndex2_2 ? 0 : 1);
+    private Infor checkFourDs(int checkIndexZero4, int rx1, int rx2, int ry1, int ry2) {
+        if (checkIndexZero4 == rx2 || checkIndexZero4 == ry2) {
+            if (checkIndexZero4 == rx2) {
+                if (ry1 + 1 < Board.getROW() && ry2 - 1 >= 0) { // |.xxxx.
+                    if (board.getValueBoard()[ry1 + 1][ry2 - 1] == board.getValueBoard()[ry1][ry2] ||
+                            board.getValueBoard()[ry1 + 1][ry2 - 1] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            } else {
+                if (rx1 - 1 >= 0 && rx2 + 1 < Board.getCOL()) { // .xxxx.|
+                    if (board.getValueBoard()[rx1 - 1][rx2 + 1] == board.getValueBoard()[rx1][rx2] ||
+                            board.getValueBoard()[rx1 - 1][rx2 + 1] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            }
+            return new Infor(4, 0, 1);
+        }
+        //.oo.oo.
+        if ((rx1 - 1 >= 0 && rx2 + 1 < Board.getCOL()) && (ry1 + 1 < Board.getROW() && ry2 - 1 >= 0)) {
+            if ((board.getValueBoard()[rx1 - 1][rx2 + 1] == board.getValueBoard()[rx1][rx2] ||
+                    board.getValueBoard()[rx1 - 1][rx2 + 1] == 0) &&
+                    (board.getValueBoard()[ry1 + 1][ry2 - 1] == board.getValueBoard()[ry1][ry2] ||
+                            board.getValueBoard()[ry1 + 1][ry2 - 1] == 0)) {
+                return new Infor(4, 1, 0);
+            }
+        }
+        // xooo.ox
+        return new Infor(4, 1, 1);
+    }
+
+    private Infor checkThreeDs(int checkIndexZero3_1, int checkIndexZero3_2, int rx1, int rx2, int ry1, int ry2) {
+        if (checkIndexZero3_1 == rx2 && checkIndexZero3_2 == ry2) { // .000.
+            return new Infor(3, 0, 0);
+        }
+        // ..ooo
+        if (checkIndexZero3_1 == rx2 && checkIndexZero3_1 - 1 == checkIndexZero3_2) {
+            if (ry1 + 1 < Board.getROW() && ry2 - 1 >= 0) { // |.xxxx.
+                if (board.getValueBoard()[ry1 + 1][ry2 - 1] == board.getValueBoard()[ry1][ry2] ||
+                        board.getValueBoard()[ry1 + 1][ry2 - 1] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // ..ooox
+                return new Infor(3, 0, 1);
+            }
+        }
+        // ooo..
+        if (checkIndexZero3_2 == ry2 && checkIndexZero3_1 - 1 == checkIndexZero3_2) {
+            if (rx1 - 1 >= 0 && rx2 + 1 < Board.getCOL()) { // .xxxx.|
+                if (board.getValueBoard()[rx1 - 1][rx2 + 1] == board.getValueBoard()[rx1][rx2] ||
+                        board.getValueBoard()[rx1 - 1][rx2 + 1] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // xooo..
+                return new Infor(3, 0, 1);
+            }
+        }
+        // _o.o.o_
+        if ((rx1 - 1 >= 0 && rx2 + 1 < Board.getCOL()) && (ry1 + 1 < Board.getROW() && ry2 - 1 >= 0)) {
+            if ((board.getValueBoard()[rx1 - 1][rx2 + 1] == board.getValueBoard()[rx1][rx2] ||
+                    board.getValueBoard()[rx1 - 1][rx2 + 1] == 0) &&
+                    (board.getValueBoard()[ry1 + 1][ry2 - 1] == board.getValueBoard()[ry1][ry2] ||
+                            board.getValueBoard()[ry1 + 1][ry2 - 1] == 0)) {
+                return new Infor(3, 1, 0);
+            }
+        }
+        // xo.o.ox
+        return new Infor(3, 1, 1);
+    }
+
+    private Infor checkTwoDs(int checkIndex2_1, int checkIndex2_2, int rx1, int rx2, int ry1, int ry2) {
+        if (checkIndex2_1 - 1 == checkIndex2_2) {
+            if ((rx1 - 1 >= 0 && rx2 + 1 < Board.getCOL()) && (ry1 + 1 < Board.getROW() && ry2 - 1 >= 0)) {
+                if ((board.getValueBoard()[rx1 - 1][rx2 + 1] == board.getValueBoard()[rx1][rx2] ||
+                        board.getValueBoard()[rx1 - 1][rx2 + 1] == 0) &&
+                        (board.getValueBoard()[ry1 + 1][ry2 - 1] == board.getValueBoard()[ry1][ry2] ||
+                                board.getValueBoard()[ry1 + 1][ry2 - 1] == 0)) {
+                    return new Infor(2, 0, 0);
+                }
+            }
+        }
+        // .o...o.
+        if ((rx1 - 1 >= 0 && rx2 + 1 < Board.getCOL()) && (ry1 + 1 < Board.getROW() && ry2 - 1 >= 0)) {
+            if ((board.getValueBoard()[rx1 - 1][rx2 + 1] == board.getValueBoard()[rx1][rx2] ||
+                    board.getValueBoard()[rx1 - 1][rx2 + 1] == 0) &&
+                    (board.getValueBoard()[ry1 + 1][ry2 - 1] == board.getValueBoard()[ry1][ry2] ||
+                            board.getValueBoard()[ry1 + 1][ry2 - 1] == 0)) {
+                return new Infor(2, 1, 0);
+            }
+        }
+        //xoo...x
+        return new Infor(2, 1, 1);
+
+    }
+
+    private Infor checkFourDm(int checkIndexZero4, int rx1, int rx2, int ry1, int ry2) {
+        if (checkIndexZero4 == rx2 || checkIndexZero4 == ry2) {
+            if (checkIndexZero4 == rx2) {
+                if (ry1 + 1 < Board.getROW() && ry2 + 1 < Board.getCOL()) { // .xxxx.|
+                    if (board.getValueBoard()[ry1 + 1][ry2 + 1] == board.getValueBoard()[ry1][ry2] ||
+                            board.getValueBoard()[ry1 + 1][ry2 + 1] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            } else {
+                if (rx1 - 1 >= 0 && rx2 - 1 >= 0) { // |.xxxx.
+                    if (board.getValueBoard()[rx1 - 1][rx2 - 1] == board.getValueBoard()[rx1][rx2] ||
+                            board.getValueBoard()[rx1 - 1][rx2 - 1] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            }
+            return new Infor(4, 0, 1);
+        }
+        //.oo.oo.
+        if ((ry1 + 1 < Board.getROW() && ry2 + 1 < Board.getCOL()) &&
+                (rx1 - 1 >= 0 && rx2 - 1 >= 0)) {
+            if ((board.getValueBoard()[ry1 + 1][ry2 + 1] == board.getValueBoard()[ry1][ry2] ||
+                    board.getValueBoard()[ry1 + 1][ry2 + 1] == 0) &&
+                    (board.getValueBoard()[rx1 - 1][rx2 - 1] == board.getValueBoard()[rx1][rx2] ||
+                            board.getValueBoard()[rx1 - 1][rx2 - 1] == 0)) {
+                return new Infor(4, 1, 0);
+            }
+        }
+        // xooo.ox
+        return new Infor(4, 1, 1);
+    }
+
+    private Infor checkThreeDm(int checkIndexZero3_1, int checkIndexZero3_2, int rx1, int rx2, int ry1, int ry2) {
+//        System.out.println(rx1 + " " + rx2 + " " + ry1 + " " + ry2);
+        if (checkIndexZero3_1 == rx2 && checkIndexZero3_2 == ry2) { // .000.
+            return new Infor(3, 0, 0);
+        }
+        // ..ooo
+        if (checkIndexZero3_1 == rx2 && checkIndexZero3_1 + 1 == checkIndexZero3_2) {
+            if (ry1 + 1 < Board.getROW() && ry2 + 1 < Board.getCOL()) {
+                if (board.getValueBoard()[ry1 + 1][ry2 + 1] == board.getValueBoard()[ry1][ry2] ||
+                        board.getValueBoard()[ry1 + 1][ry2 + 1] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // ..ooox
+                return new Infor(3, 0, 1);
+            }
+        }
+        // ooo..
+        if (checkIndexZero3_2 == ry2 && checkIndexZero3_1 + 1 == checkIndexZero3_2) {
+            if (rx1 - 1 >= 0 && rx2 - 1 >= 0) { // |.xxxx.
+                if (board.getValueBoard()[rx1 - 1][rx2 - 1] == board.getValueBoard()[rx1][rx2] ||
+                        board.getValueBoard()[rx1 - 1][rx2 - 1] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // xooo..
+                return new Infor(3, 0, 1);
+            }
+        }
+        // _o.o.o_
+        if ((ry1 + 1 < Board.getROW() && ry2 + 1 < Board.getCOL()) &&
+                (rx1 - 1 >= 0 && rx2 - 1 >= 0)) {
+            if ((board.getValueBoard()[ry1 + 1][ry2 + 1] == board.getValueBoard()[ry1][ry2] ||
+                    board.getValueBoard()[ry1 + 1][ry2 + 1] == 0) &&
+                    (board.getValueBoard()[rx1 - 1][rx2 - 1] == board.getValueBoard()[rx1][rx2] ||
+                            board.getValueBoard()[rx1 - 1][rx2 - 1] == 0)) {
+                return new Infor(3, 1, 0);
+            }
+        }
+        // xo.o.ox
+        return new Infor(3, 1, 1);
+    }
+
+    private Infor checkTwoDm(int checkIndex2_1, int checkIndex2_2, int rx1, int rx2, int ry1, int ry2) {
+        if (checkIndex2_1 + 1 == checkIndex2_2) {
+            if ((ry1 + 1 < Board.getROW() && ry2 + 1 < Board.getCOL()) &&
+                    (rx1 - 1 >= 0 && rx2 - 1 >= 0)) {
+                if ((board.getValueBoard()[ry1 + 1][ry2 + 1] == board.getValueBoard()[ry1][ry2] ||
+                        board.getValueBoard()[ry1 + 1][ry2 + 1] == 0) &&
+                        (board.getValueBoard()[rx1 - 1][rx2 - 1] == board.getValueBoard()[rx1][rx2] ||
+                                board.getValueBoard()[rx1 - 1][rx2 - 1] == 0)) {
+                    return new Infor(2, 0, 0);
+                }
+            }
+        }
+        // .o...o.
+        if ((ry1 + 1 < Board.getROW() && ry2 + 1 < Board.getCOL()) &&
+                (rx1 - 1 >= 0 && rx2 - 1 >= 0)) {
+            if ((board.getValueBoard()[ry1 + 1][ry2 + 1] == board.getValueBoard()[ry1][ry2] ||
+                    board.getValueBoard()[ry1 + 1][ry2 + 1] == 0) &&
+                    (board.getValueBoard()[rx1 - 1][rx2 - 1] == board.getValueBoard()[rx1][rx2] ||
+                            board.getValueBoard()[rx1 - 1][rx2 - 1] == 0)) {
+                return new Infor(2, 1, 0);
+            }
+        }
+        //xoo...x
+        return new Infor(2, 1, 1);
+
+    }
+
+    private Infor checkFourV(int checkIndexZero4, int x, int y, int rx, int ry) {
+        if (checkIndexZero4 == x || checkIndexZero4 == y) {
+            if (checkIndexZero4 == x) {
+                if (y + 1 < Board.getROW()) { // .xxxx.|
+                    if (board.getValueBoard()[y + 1][ry] == board.getValueBoard()[y][ry] ||
+                            board.getValueBoard()[y + 1][ry] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            } else {
+                if (x - 1 >= 0) { // |.xxxx.
+                    if (board.getValueBoard()[x - 1][ry] == board.getValueBoard()[x][ry] ||
+                            board.getValueBoard()[x - 1][ry] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            }
+            return new Infor(4, 0, 1);
+        }
+        //.oo.oo.
+        if (x - 1 >= 0 && y + 1 < Board.getROW()) {
+            if ((board.getValueBoard()[y + 1][ry] == board.getValueBoard()[y][ry] ||
+                    board.getValueBoard()[y + 1][ry] == 0) &&
+                    (board.getValueBoard()[x - 1][ry] == board.getValueBoard()[x][ry] ||
+                            board.getValueBoard()[x - 1][ry] == 0)) {
+                return new Infor(4, 1, 0);
+            }
+        }
+        // xooo.ox
+        return new Infor(4, 1, 1);
+    }
+
+    private Infor checkThreeV(int checkIndexZero3_1, int checkIndexZero3_2, int bg, int en, int rx, int ry) {
+        if (checkIndexZero3_1 == bg && checkIndexZero3_2 == en) { // .000.
+            return new Infor(3, 0, 0);
+        }
+        // ..ooo
+        if (checkIndexZero3_1 == bg && checkIndexZero3_1 + 1 == checkIndexZero3_2) {
+            if (en + 1 < Board.getROW()) {
+                // x..ooo.|
+                if (board.getValueBoard()[en + 1][ry] == board.getValueBoard()[en][ry] ||
+                        board.getValueBoard()[en + 1][ry] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // ..ooox
+                return new Infor(3, 0, 1);
+            }
+        }
+        // ooo..
+        if (checkIndexZero3_2 == en && checkIndexZero3_1 + 1 == checkIndexZero3_2) {
+            if (bg - 1 >= 0) {
+                // .ooo..x
+                if (board.getValueBoard()[bg - 1][ry] == board.getValueBoard()[bg][ry] ||
+                        board.getValueBoard()[bg - 1][ry] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // xooo..
+                return new Infor(3, 0, 1);
+            }
+        }
+        // _o.o.o_
+        if (bg - 1 >= 0 && en + 1 < Board.getROW()) {
+            if ((board.getValueBoard()[en + 1][ry] == board.getValueBoard()[en][ry] ||
+                    board.getValueBoard()[en + 1][ry] == 0) &&
+                    (board.getValueBoard()[bg - 1][ry] == board.getValueBoard()[bg][ry] ||
+                            board.getValueBoard()[bg - 1][ry] == 0)) {
+                return new Infor(3, 1, 0);
+            }
+        }
+        // xo.o.ox
+        return new Infor(3, 1, 1);
+    }
+
+    private Infor checkTwoV(int checkIndex2_1, int checkIndex2_2, int x, int y, int rx, int ry) {
+        if (checkIndex2_1 + 1 == checkIndex2_2) {
+            if (x - 1 >= 0 && y + 1 < Board.getROW()) {
+                if ((board.getValueBoard()[x - 1][ry] == board.getValueBoard()[x - 1][ry] ||
+                        board.getValueBoard()[x - 1][ry] == 0) &&
+                        (board.getValueBoard()[y + 1][ry] == board.getValueBoard()[y][ry] ||
+                                board.getValueBoard()[y + 1][ry] == 0)) {
+                    return new Infor(2, 0, 0);
+                }
+            }
+            return new Infor(2, 0, 1);
+        }
+        if (x - 1 >= 0 && y + 1 < Board.getROW()) {
+            if ((board.getValueBoard()[x - 1][ry] == board.getValueBoard()[x - 1][ry] ||
+                    board.getValueBoard()[x - 1][ry] == 0) &&
+                    (board.getValueBoard()[y + 1][ry] == board.getValueBoard()[y][ry] ||
+                            board.getValueBoard()[y + 1][ry] == 0)) {
+                return new Infor(2, 1, 0);
+            }
+        }
+        return new Infor(2, 1, 1);
+    }
+
+    private Infor checkFourH(int checkIndexZero4, int x, int y, int rx, int ry) {
+        if (checkIndexZero4 == x || checkIndexZero4 == y) {
+            if (checkIndexZero4 == x) {
+                if (y + 1 < Board.getCOL()) { // .xxxx.|
+                    if (board.getValueBoard()[rx][y + 1] == board.getValueBoard()[rx][y] ||
+                            board.getValueBoard()[rx][y + 1] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            } else {
+                if (x - 1 >= 0) { // |.xxxx.
+                    if (board.getValueBoard()[rx][x - 1] == board.getValueBoard()[rx][x] ||
+                            board.getValueBoard()[rx][x - 1] == 0) {
+                        return new Infor(4, 0, 0);
+                    }
+                }
+            }
+            return new Infor(4, 0, 1);
+        }
+        //.oo.oo.
+        if (x - 1 >= 0 && y + 1 < Board.getCOL()) {
+            if ((board.getValueBoard()[rx][x - 1] == board.getValueBoard()[rx][x] ||
+                    board.getValueBoard()[rx][x - 1] == 0) && (board.getValueBoard()[rx][y + 1] == board.getValueBoard()[rx][y] ||
+                    board.getValueBoard()[rx][y + 1] == 0)) {
+                return new Infor(4, 1, 0);
+            }
+        }
+        // xooo.ox
+        return new Infor(4, 1, 1);
+    }
+
+    private Infor checkThreeH(int checkIndexZero3_1, int checkIndexZero3_2, int bg, int en, int rx, int ry) {
+        if (checkIndexZero3_1 == bg && checkIndexZero3_2 == en) { // .000.
+            return new Infor(3, 0, 0);
+        }
+        // ..ooo
+        if (checkIndexZero3_1 == bg && checkIndexZero3_1 + 1 == checkIndexZero3_2) {
+            if (en + 1 < Board.getCOL()) {
+                // x..ooo.|
+                if (board.getValueBoard()[rx][en + 1] == board.getValueBoard()[rx][en] ||
+                        board.getValueBoard()[rx][en + 1] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // ..ooox
+                return new Infor(3, 0, 1);
+            }
+        }
+        // ooo..
+        if (checkIndexZero3_2 == en && checkIndexZero3_1 + 1 == checkIndexZero3_2) {
+            if (bg - 1 >= 0) {
+                // .ooo..x
+                if (board.getValueBoard()[rx][bg] == board.getValueBoard()[rx][bg - 1] ||
+                        board.getValueBoard()[rx][bg - 1] == 0) {
+                    return new Infor(3, 0, 0);
+                }
+            } else {
+                // xooo..
+                return new Infor(3, 0, 1);
+            }
+        }
+        // _o.o.o_
+        if (bg - 1 >= 0 && en + 1 < Board.getCOL()) {
+            if ((board.getValueBoard()[rx][bg] == board.getValueBoard()[rx][bg - 1] ||
+                    board.getValueBoard()[rx][bg - 1] == 0) &&
+                    (board.getValueBoard()[rx][en + 1] == board.getValueBoard()[rx][en] ||
+                            board.getValueBoard()[rx][en + 1] == 0)) {
+                return new Infor(3, 1, 0);
+            }
+        }
+        // xo.o.ox
+        return new Infor(3, 1, 1);
+    }
+
+    private Infor checkTwoH(int checkIndex2_1, int checkIndex2_2, int x, int y, int rx, int ry) {
+
+        if (checkIndex2_1 + 1 == checkIndex2_2) {
+            if (x - 1 >= 0 && y + 1 < Board.getCOL()) {
+                if (((board.getValueBoard()[rx][x - 1] == board.getValueBoard()[rx][x]) ||
+                        board.getValueBoard()[rx][x - 1] == 0) &&
+                        ((board.getValueBoard()[rx][y + 1] == board.getValueBoard()[rx][y]) ||
+                                board.getValueBoard()[rx][y + 1] == 0)) {
+                    return new Infor(2, 0, 0);
+                }
+
+            }
+            return new Infor(2, 0, 1);
+        }
+
+        if (x - 1 >= 0 && y + 1 < Board.getCOL()) {
+            if (((board.getValueBoard()[rx][x - 1] == board.getValueBoard()[rx][x]) ||
+                    board.getValueBoard()[rx][x - 1] == 0) &&
+                    ((board.getValueBoard()[rx][y + 1] == board.getValueBoard()[rx][y]) ||
+                            board.getValueBoard()[rx][y + 1] == 0)) {
+                return new Infor(2, 1, 0);
+            }
+
+        }
+
+
+        return new Infor(2, 1, 1);
     }
 
 
-//    public static void main(String[] args) {
-//
-//        board.getValueBoard()[4][4] = 1;
-//        board.getValueBoard()[5][5] = 0;
-//        board.getValueBoard()[6][10] = 0;
-//        board.getValueBoard()[7][10] = 0;
-//        board.getValueBoard()[8][10] = 1;
-//        board.getValueBoard()[9][10] = 1;
-//        board.getValueBoard()[10][10] = 1;
-//        board.getValueBoard()[11][9] = 1;
-//        board.getValueBoard()[12][8] = 1;
-//        board.getValueBoard()[13][7] = 1;
-//        board.getValueBoard()[14][6] = 1;
-//        board.getValueBoard()[15][5] = 1;
-//        board.getValueBoard()[16][4] = 2;
+    public static void main(String[] args) {
 
-//        int value = new Heuristic_2().atttack(new Point(10, 10), board.getValueBoard(), 1);
-//        System.out.println(value);
-//    }
+        board.getValueBoard()[10][10] = 1;
+        board.getValueBoard()[9][9] = 1;
+        board.getValueBoard()[8][8] = 1;
+        board.getValueBoard()[11][9] = 1;
+        board.getValueBoard()[12][8] = 0;
+        board.getValueBoard()[11][7] = 1;
 
+        new Heuristic_2().atttack(new Point(10 , 10) , board.getValueBoard() , 1);
+
+
+    }
 }
