@@ -7,23 +7,57 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import control.Heuristic_2;
+import control.Heuristic_3;
 import view.Board;
 
 public abstract class Entity {
 
     private final Board board = Board.getBoard();
-    private static final int depth = 3;
+    private static int depth = 4;
 
     // move AI AND PLAYER
     public abstract void move(int[][] valueBoard);
 
     protected Point getBestMove(int[][] valueBoard) {
         // chạy những node có thể đi và thử xem đi node nò là tốt nhất
+        depth = 4;
+        ArrayList<Point> listCango = board.pointCanGo(valueBoard);
+        int bestPointA = bestPoint(listCango, valueBoard, 2);
+        int bestPointU = bestPoint(listCango, valueBoard, 1);
+        int max = Math.max(bestPointA, bestPointU);
+//        if (max < Board.getWay3() ) depth = 3;
+        if ((max >= Board.getWay3() && max <= Board.getWay4()) ||
+                max >= Board.getWay4() && max < board.getScoreWin()) depth = 3;
+        if(max >= board.getScoreWin()) depth  = 2;
+//        for (Resurt i:
+//             sortList) {
+//            System.out.println(i.toString());
+//        }
+//        System.out.println("--------------------------");
+//
+        System.out.println("de = " + depth);
 
         Resurt bestMove = minimaxAlphaBeta(valueBoard, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         System.out.println(bestMove.toString());
 //        System.out.println("new ======================================");
         return new Point(bestMove.x, bestMove.y);
+    }
+
+    private int bestPoint(ArrayList<Point> listCango, int[][] valueBoard, int id) {
+        ArrayList<Resurt> sortList = new ArrayList<>();
+        Iterator<Point> iterator = listCango.iterator();
+        while (iterator.hasNext()) {
+            Point i = iterator.next();
+            valueBoard[i.x][i.y] = 1;
+            board.getWentGo().add(i);
+            int attack = new Heuristic_3().think(valueBoard, id);
+            sortList.add(new Resurt(i.x, i.y, attack));
+            valueBoard[i.x][i.y] = 0;
+            board.getWentGo().remove(i);
+        }
+        Collections.sort(sortList);
+        if (sortList.size() == 0) return 0;
+        else return sortList.get(0).score;
     }
 
     // thuật toán
@@ -39,7 +73,7 @@ public abstract class Entity {
             if (valuePlayer == 0) valuePlayer = 1;
             if (valueAi == 0) valueAi = 1;
             if (isMax) valueAi <<= 1;
-            else valuePlayer <<= 1;
+            else valuePlayer <<= 3;
 //            System.out.println("Ai = " + valueAi + " player = " + valuePlayer);
             int value = valueAi - valuePlayer;
             if (value > 0) value += depth;
@@ -64,8 +98,8 @@ public abstract class Entity {
 
         if (isMax) {
             Resurt bestMove = new Resurt(0, 0, Integer.MIN_VALUE);
-            for(Resurt j : sortList){
-                Point i = new Point(j.x , j.y);
+            for (Resurt j : sortList) {
+                Point i = new Point(j.x, j.y);
                 valueBoard[i.x][i.y] = 2;
                 board.getWentGo().add(i);
                 Board.setNextMove(1);
@@ -87,8 +121,8 @@ public abstract class Entity {
             return bestMove;
         } else {
             Resurt bestMove = new Resurt(0, 0, Integer.MAX_VALUE);
-            for(Resurt j : sortList){
-                Point i = new Point(j.x , j.y);
+            for (Resurt j : sortList) {
+                Point i = new Point(j.x, j.y);
                 valueBoard[i.x][i.y] = 1;
                 board.getWentGo().add(i);
                 Board.setNextMove(0);

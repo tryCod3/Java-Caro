@@ -2,6 +2,7 @@ package view;
 
 import control.Heuristic;
 import control.Heuristic_2;
+import control.Heuristic_3;
 import model.AI;
 
 import java.awt.*;
@@ -17,8 +18,8 @@ public class Board extends JPanel implements Display {
     /**
      * tạo ROW hàng và COL cột
      */
-    private static final int ROW = 12;
-    private static final int COL = 12;
+    private static final int ROW = 13;
+    private static final int COL = 13;
     private static boolean firstMove = true;
 
     public static boolean isFirstMove() {
@@ -184,7 +185,7 @@ public class Board extends JPanel implements Display {
      * </P>
      */
     public int getState(int[][] valueBoard, int idPlayer) {
-        return new Heuristic_2().think(valueBoard, idPlayer);
+        return new Heuristic_3().think(valueBoard, idPlayer);
     }
 
     /**
